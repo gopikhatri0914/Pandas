@@ -1,0 +1,48 @@
+Problem:
+Find the number of active European users who have not taken a loan.
+
+Table1: User
+Id	Name	Email	IsActive	CountryId
+
+Table2: Countries
+Id	Name	IsEUMember
+
+Table3 : Loans
+Id	BorrowerId	Amount	IsMortgage	MaturityDate	GuarantorId
+
+Output: SQL
+
+Select count(*) as cn 
+from  (select id from User where IsActive = 1) as u
+INNER JOIN (select id from Countries where IsEUMember = 1) as c 
+on c.Id = u.CountryId
+left OUTER join Loans l on l.BorrowerId = u.id
+WHERE L.BorrowerId IS NULL;
+
+
+Python code:
+import pandas as pd
+
+file_path = "Python_developer_test.xlsx"
+users_df = pd.read_excel(file_path, header=4, sheet_name="Users")
+countries_df = pd.read_excel(file_path, sheet_name="Countries")
+loans_df = pd.read_excel(file_path, sheet_name="Loans")
+
+# Filter active users
+users_df = users_df[users_df['IsActive'] == 1]
+
+# Filter European countries
+countries_df = countries_df[countries_df['IsEUMember'] == 1]
+
+european_user_df= pd.merge(users_df, countries_df, left_on='CountryId', right_on='Id',how='inner')
+user_with_Loans_df = pd.merge(european_user_df,loans_df, left_on='Id_x', right_on='BorrowerId', how ='left')
+user_without_loan_df = user_with_Loans_df[user_with_Loans_df['BorrowerId'].isnull()]
+result_count = user_without_loan_df.shape[0]
+print(result_count)
+
+
+output: 133
+
+
+
+
